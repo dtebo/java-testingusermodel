@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  */
 //@EnableJpaAuditing
 @SpringBootApplication
-public class UserModelApplication
+public class UserModelApplicationTest
 {
     /**
      * Main method to start the application.
@@ -18,7 +18,7 @@ public class UserModelApplication
      */
     public static void main(String[] args)
     {
-        SpringApplication.run(UserModelApplication.class,
+        SpringApplication.run(UserModelApplicationTest.class,
             args);
     }
 }
