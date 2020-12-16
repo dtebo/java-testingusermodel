@@ -10,8 +10,10 @@ import com.lambdaschool.usermodel.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.Request;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,11 +158,77 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUserByName() {
+    public void getUserByName() throws Exception{
+        String apiUrl = "/users/user/name/cinnamon";
+
+        Mockito.when(userService.findByName("cinnamon"))
+                .thenReturn(userList.get(0));
+
+        RequestBuilder rb = MockMvcRequestBuilders.get(apiUrl)
+                .accept(MediaType.APPLICATION_JSON);
+        MvcResult r = mockMvc.perform(rb)
+                .andReturn();
+        String tr = r.getResponse()
+                .getContentAsString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String er = mapper.writeValueAsString(userList.get(0));
+
+        System.out.println("Expect: " + er);
+        System.out.println("Actual: " + tr);
+
+        Assert.assertEquals("Rest API Returns List",
+                er,
+                tr);
     }
 
     @Test
-    public void getUserLikeName() {
+    public void getUserByNameNotFound() throws Exception{
+        String apiUrl = "/users/user/name/cinnamonssss";
+
+        Mockito.when(userService.findByName("cinnamonssss"))
+                .thenReturn(null);
+
+        RequestBuilder rb = MockMvcRequestBuilders.get(apiUrl)
+                .accept(MediaType.APPLICATION_JSON);
+        MvcResult r = mockMvc.perform(rb)
+                .andReturn();
+        String tr = r.getResponse()
+                .getContentAsString();
+
+        String er = "";
+
+        System.out.println("Expect: " + er);
+        System.out.println("Actual: " + tr);
+
+        Assert.assertEquals("Rest API Returns List",
+                er,
+                tr);
+    }
+
+    @Test
+    public void getUserLikeName() throws Exception{
+        String apiUrl = "/users/user/name/like/barn";
+
+        Mockito.when(userService.findByNameContaining("barn"))
+                .thenReturn(userList);
+
+        RequestBuilder rb = MockMvcRequestBuilders.get(apiUrl)
+                .accept(MediaType.APPLICATION_JSON);
+        MvcResult r = mockMvc.perform(rb)
+                .andReturn();
+        String tr = r.getResponse()
+                .getContentAsString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String er = mapper.writeValueAsString(userList);
+
+        System.out.println("Expect: " + er);
+        System.out.println("Actual: " + tr);
+
+        Assert.assertEquals("Rest API Returns List",
+                er,
+                tr);
     }
 
     @Test
