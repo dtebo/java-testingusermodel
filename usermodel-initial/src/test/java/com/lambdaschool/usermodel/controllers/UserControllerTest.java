@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -232,11 +235,93 @@ public class UserControllerTest {
     }
 
     @Test
-    public void addNewUser() {
+    public void addNewUser() throws Exception {
+        String apiUrl = "/users/user/";
+
+        Role r5 = new Role("Test");
+        r5.setRoleid(50);
+        Role r6 = new Role("AdminTest");
+        r6.setRoleid(51);
+
+        User u2 = new User("cinnamon",
+                "1234567",
+                "cinnamon@lambdaschool.local");
+        u2.setUserid(60);
+        u2.getRoles()
+                .add(new UserRoles(u2,
+                        r5));
+        u2.getRoles()
+                .add(new UserRoles(u2,
+                        r6));
+        u2.getUseremails()
+                .add(new Useremail(u2,
+                        "cinnamon@mymail.local"));
+        u2.getUseremails()
+                .add(new Useremail(u2,
+                        "hops@mymail.local"));
+        u2.getUseremails()
+                .add(new Useremail(u2,
+                        "bunny@email.local"));
+
+        ObjectMapper mapper = new ObjectMapper();
+        String userString = mapper.writeValueAsString(u2);
+
+        Mockito.when(userService.save(any(User.class)))
+                .thenReturn(u2);
+
+        RequestBuilder rb = MockMvcRequestBuilders.post(apiUrl)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userString);
+
+        mockMvc.perform(rb)
+                .andExpect(status().isCreated())
+                .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
-    public void updateFullUser() {
+    public void updateFullUser() throws Exception {
+        String apiUrl = "/users/user/7";
+
+        Role r5 = new Role("Test");
+        r5.setRoleid(5);
+        Role r6 = new Role("AdminTest");
+        r6.setRoleid(6);
+
+        User u2 = new User("cinnamons",
+                "1234567",
+                "cinnamon@lambdaschool.local");
+        u2.setUserid(7);
+        u2.getRoles()
+                .add(new UserRoles(u2,
+                        r5));
+        u2.getRoles()
+                .add(new UserRoles(u2,
+                        r6));
+        u2.getUseremails()
+                .add(new Useremail(u2,
+                        "cinnamon@mymail.local"));
+        u2.getUseremails()
+                .add(new Useremail(u2,
+                        "hops@mymail.local"));
+        u2.getUseremails()
+                .add(new Useremail(u2,
+                        "bunny@email.local"));
+
+        ObjectMapper mapper = new ObjectMapper();
+        String userString = mapper.writeValueAsString(u2);
+
+        Mockito.when(userService.update(u2, 7L))
+                .thenReturn(u2);
+
+        RequestBuilder rb = MockMvcRequestBuilders.put(apiUrl, 7L)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userString);
+
+        mockMvc.perform(rb)
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
     }
 
     @Test
